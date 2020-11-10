@@ -63,8 +63,10 @@ class XPuzzle:
         return 0
 
     # wrapping move will auto detect if possible and will do it if it is
-    # NOTE: THERE IS NEW LOGIC IF IT'S NOT 2X4 AND CAN WRAP WITH COLUMNS
-    def wrapping_move(self):
+    def wrapping_move(self, wrap_column = False):
+        if(wrap_column and self.rows > 2):
+            return self.__wrapping_move_with_column()
+
         diagonal_info = self.__corner_position_information()
 
         if(diagonal_info['is_zero_top_left']):
@@ -78,6 +80,25 @@ class XPuzzle:
 
         if(diagonal_info['is_zero_bottom_right']):
             return self.__swap(self.rows - 1, 0)
+
+        print('Invalid Wrapping Move')
+        return -1
+    
+    # This is only possible if requested and more than 2 rows
+    def __wrapping_move_with_column(self):
+        diagonal_info = self.__corner_position_information()
+
+        if(diagonal_info['is_zero_top_left']):
+            return self.__swap(self.row - 1, 0)
+
+        if(diagonal_info['is_zero_top_right']):
+            return self.__swap(self.rows - 1, self.cols - 1)
+
+        if(diagonal_info['is_zero_bottom_left']):
+            return self.__swap(0, 0)
+
+        if(diagonal_info['is_zero_bottom_right']):
+            return self.__swap(0, self.cols - 1)
 
         print('Invalid Wrapping Move')
         return -1
@@ -123,10 +144,30 @@ class XPuzzle:
         
         print("Invalid Diagonal Move")
         return -1
-        
 
-        
+    def is_goal_state(self):
+        goal_string = ''
+        for i in range((self.cols * self.rows) - 1):
+            goal_string += str(i + 1) + ' '
+        goal_string += '0'
 
+        formatted_list = ' '.join(map(str, [ y for x in self.arr for y in x]))
+        return goal_string == formatted_list
 
-puzzle = XPuzzle(2, 4, '1 0 3 7 5 2 6 4')
-#puzzle2 = XPuzzle(3, 8, '3 0 1 4 2 6 5 7 6 3 4 7 1 2 5 0 1 0 3 6 5 2 7 4')
+# Examples
+#puzzle = XPuzzle(2, 4, '1 0 3 7 5 2 6 4')
+#puzzle.regular_move('left');
+#puzzle.diagonal_move(False)
+#puzzle.diagonal_move(True)
+#puzzle.wrapping_move()
+#puzzle.regular_move('right')
+#puzzle.regular_move('left')
+#puzzle.regular_move('up')
+#puzzle.regular_move('down')
+#puzzle.pretty_print_array()
+#print('goal state? ' + str(puzzle.is_goal_state()))
+
+#puzzleGoal = XPuzzle(2, 4, '1 2 3 4 5 6 7 0')
+#puzzleGoal.is_goal_state()
+
+#puzzleBig = XPuzzle(3, 8, '1 2 3 4 0 6 7 8 9 10 11 12 13 14 15 16 17 5')
