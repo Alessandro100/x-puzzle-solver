@@ -1,3 +1,4 @@
+import time
 from xpuzzle import XPuzzle
 
 class UniformCost:
@@ -6,7 +7,8 @@ class UniformCost:
         self.close_list = {}
 
     def run(self):
-        initial_state = "6 3 4 7 1 2 5 0"
+        start = time.time()
+        initial_state = "1 0 3 6 5 2 7 4"
         goal_state = "1 2 3 4 5 6 7 0"
         open_list = self.set_state_open_list(initial_state, 0, {}) # nodes that need to be visited (priority queue or dictionairy)
 
@@ -14,7 +16,7 @@ class UniformCost:
         while(len(open_list) > 0):
             # finds the smallest cost path and visits it
             current_node_key = min(open_list, key=open_list.get)
-            print(open_list[current_node_key])
+            print("0 0 " + current_node_key)
             
             # checks if goal state was reached
             if(current_node_key == goal_state):
@@ -31,10 +33,8 @@ class UniformCost:
             # removes the visited node from the open list
             open_list.pop(current_node_key)
 
-        print('I finished running')
-
-
-            
+        end = time.time()
+        print('I finished running in: ' + str(end - start) + " seconds")
 
     def normal_move_action_string(self, state, action):
         puzzle = XPuzzle(2,4, state)
