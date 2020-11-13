@@ -2,17 +2,21 @@ import time
 from queue import PriorityQueue
 from xpuzzle import XPuzzle
 
+## what to do next:
+# clean up your code to fit the submission document
+
 class UniformCost:
-    def __init__(self):
+    def __init__(self, initial_state):
         print("class init")
         self.close_list = PriorityQueue()
         self.open_list = PriorityQueue()
+        self.goal_node = ()
+        self.initial_state = initial_state
 
     def run(self):
         start = time.time()
-        initial_state = "6 3 4 7 1 2 5 0"
         goal_state = "1 2 3 4 5 6 7 0"
-        self.set_state_open_list(initial_state, 0) # nodes that need to be visited (priority queue or dictionairy)
+        self.set_state_open_list(self.initial_state, 0) # nodes that need to be visited (priority queue or dictionairy)
 
         print('start loop')
         while not self.open_list.empty():
@@ -25,8 +29,7 @@ class UniformCost:
             
             # checks if goal state was reached
             if(current_node_key == goal_state):
-                print("I reached the goal state!")
-                print("COST: " + str(current_node_cost))
+                self.goal_node = current_node
                 break
 
             # we need to add this key to the closed list
@@ -37,6 +40,7 @@ class UniformCost:
 
         end = time.time()
         print('I finished running in: ' + str(end - start) + " seconds")
+        self.get_algorithm_stats()
 
     def normal_move_action_string(self, state, action):
         puzzle = XPuzzle(2,4, state)
@@ -77,14 +81,22 @@ class UniformCost:
         right_action = self.normal_move_action_string(current_state, "right")
         if(right_action != -1): self.open_list.put(((1 + base_amount), right_action, current_state))
 
-        # wrapping_action = self.wrapping_move_action_string(current_state)
-        # if(wrapping_action != -1 and not (wrapping_action in self.close_list)): open_list[wrapping_action] = (2 + base_amount)
+        wrapping_action = self.wrapping_move_action_string(current_state)
+        if(wrapping_action != -1): self.open_list.put(((2 + base_amount), wrapping_action, current_state))
 
-        # diagonal_action = self.diagonal_move_action_string(current_state, False)
-        # if(diagonal_action != -1 and not (diagonal_action in self.close_list)): open_list[diagonal_action] = (3 + base_amount)
+        diagonal_action = self.diagonal_move_action_string(current_state, False)
+        if(diagonal_action != -1): self.open_list.put(((3 + base_amount), diagonal_action, current_state)) 
 
-        # diagonal_action_wrap = self.diagonal_move_action_string(current_state, True)
-        # if(diagonal_action_wrap != -1 and not (diagonal_action_wrap in self.close_list)): open_list[diagonal_action_wrap] = (3 + base_amount)
+        diagonal_action_wrap = self.diagonal_move_action_string(current_state, True)
+        if(diagonal_action_wrap != -1): self.open_list.put(((3 + base_amount), diagonal_action_wrap, current_state)) 
 
-algo = UniformCost()
-algo.run() 
+    def get_algorithm_stats(self):
+        if(not self.goal_node):
+            print("No goal node")
+        else:
+            print("COST: " + str(self.goal_node[0]))
+            print("KEY: " + str(self.goal_node[1]))
+            print("PREV: " + str(self.goal_node[2]))
+
+algo = UniformCost("1 0 3 6 5 2 7 4")
+algo.run()
