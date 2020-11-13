@@ -7,8 +7,6 @@ class XPuzzle:
         # we keep track of the 0 position to increase the performance of our algorithm
         self.zero_position = (0,0) #row, column
         self.__initialize_data_strcuture(input)
-        print('Input: ' + input)
-        self.pretty_print_array()
 
     # takes the input and formats it to the wanted data structure
     def __initialize_data_strcuture(self, input):
@@ -35,8 +33,8 @@ class XPuzzle:
         zero_row = self.zero_position[0]
         zero_col = self.zero_position[1]
         is_up_move_valid = (move_direction_of_empty_tile == 'up' and self.zero_position[0] != 0)
-        is_down_move_valid = (move_direction_of_empty_tile == 'down' and self.zero_position[0] != str(self.rows - 1))
-        is_right_move_valid = (move_direction_of_empty_tile == 'right' and self.zero_position[1] != str(self.cols - 1))
+        is_down_move_valid = (move_direction_of_empty_tile == 'down' and self.zero_position[0] != self.rows - 1)
+        is_right_move_valid = (move_direction_of_empty_tile == 'right' and self.zero_position[1] != self.cols - 1)
         is_left_move_valid = (move_direction_of_empty_tile == 'left' and self.zero_position[1] != 0)
 
         if(is_up_move_valid):
@@ -51,7 +49,6 @@ class XPuzzle:
         if(is_left_move_valid):
             return self.__swap(zero_row, zero_col - 1)
 
-        print('Invalid Regular Move')
         return -1
 
     # takes care of the swapping logic and handles new zero position
@@ -81,7 +78,6 @@ class XPuzzle:
         if(diagonal_info['is_zero_bottom_right']):
             return self.__swap(self.rows - 1, 0)
 
-        print('Invalid Wrapping Move')
         return -1
     
     # This is only possible if requested and more than 2 rows
@@ -100,7 +96,6 @@ class XPuzzle:
         if(diagonal_info['is_zero_bottom_right']):
             return self.__swap(0, self.cols - 1)
 
-        print('Invalid Wrapping Move')
         return -1
 
     def __corner_position_information(self):
@@ -142,7 +137,6 @@ class XPuzzle:
             else:
                 return self.__swap(self.rows - 2, self.cols - 2)
         
-        print("Invalid Diagonal Move")
         return -1
 
     def is_goal_state(self):
@@ -151,11 +145,14 @@ class XPuzzle:
             goal_string += str(i + 1) + ' '
         goal_string += '0'
 
-        formatted_list = ' '.join(map(str, [ y for x in self.arr for y in x]))
-        return goal_string == formatted_list
+        return goal_string == current_state_to_string(self)
+
+    def current_state_to_string(self):
+        return ' '.join(map(str, [ y for x in self.arr for y in x]))
 
 # Examples
-#puzzle = XPuzzle(2, 4, '1 0 3 7 5 2 6 4')
+puzzle = XPuzzle(2, 4, '1 2 3 4 5 6 0 7')
+puzzle.regular_move('down')
 #puzzle.regular_move('left');
 #puzzle.diagonal_move(False)
 #puzzle.diagonal_move(True)
