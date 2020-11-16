@@ -57,7 +57,7 @@ class XPuzzle:
         self.arr[self.zero_position[0]][self.zero_position[1]] = value_swap
         self.arr[row_swap][col_swap] = 0
         self.zero_position = (row_swap, col_swap)
-        return 0
+        return value_swap
 
     # wrapping move will auto detect if possible and will do it if it is
     def wrapping_move(self, wrap_column = False):
