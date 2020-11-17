@@ -20,7 +20,8 @@ class UniformCost:
         print('start algo for: ' + self.initial_state)
         self.initialize_txt_files()
         start = time.time()
-        goal_state = self.calculate_goal_state()
+        goal_state_1 = self.calculate_goal_state_1()
+        goal_state_2 = self.calculate_goal_state_2()
         self.set_state_open_list(self.initial_state, 0) # nodes that need to be visited (priority queue or dictionairy)
         self.close_list = {}
         while not self.open_list.empty():
@@ -40,7 +41,7 @@ class UniformCost:
                     ucs_search.write(self.id + " " + str(current_node_cost) +" 0 " + current_node_key+"\n")
                 
                 # checks if goal state was reached
-                if(current_node_key == goal_state):
+                if(current_node_key == goal_state_1 or current_node_key == goal_state_2):
                     self.goal_node = current_node
                     break
 
@@ -128,7 +129,7 @@ class UniformCost:
             print(summ)
             while(previous_node != self.initial_state):
                 # 3 = tile moved, 2 = cost of move, 1 = previous move
-                value = self.close_list[previous_node][3] + " " + str(self.close_list[previous_node][2]) +" "+ previous_node
+                value = str(self.close_list[previous_node][3]) + " " + str(self.close_list[previous_node][2]) +" "+ str(previous_node)
                 order.append(value)
                 previous_node = self.close_list[previous_node][1]
             return reversed(order)
@@ -141,11 +142,23 @@ class UniformCost:
         uniform_cost_solution_file.write("0 0 " + self.initial_state + "\n")
         uniform_cost_solution_file.close()
 
-    def calculate_goal_state(self):
+    def calculate_goal_state_1(self):
         goal_string = ''
         for i in range((self.cols * self.rows) - 1):
             goal_string += str(i + 1) + ' '
         goal_string += '0'
+        return goal_string
+    
+    def calculate_goal_state_2(self):
+        goal_string = ''
+        even = ''
+        odd = ''
+        for i in range((self.cols * self.rows) - 1):
+            if((i + 1) % 2 == 0):
+               even += str(i + 1) + " "
+            else:
+                odd += str(i + 1) + " "
+        goal_string = odd + even + "0"
         return goal_string
                 
 
