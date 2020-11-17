@@ -85,7 +85,7 @@ class XPuzzle:
         diagonal_info = self.__corner_position_information()
 
         if(diagonal_info['is_zero_top_left']):
-            return self.__swap(self.row - 1, 0)
+            return self.__swap(self.rows - 1, 0)
 
         if(diagonal_info['is_zero_top_right']):
             return self.__swap(self.rows - 1, self.cols - 1)
