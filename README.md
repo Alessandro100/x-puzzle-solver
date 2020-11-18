@@ -13,3 +13,5 @@ python3 analysis.py
 ```
 
 This will run all of the algorithms and generate an output file with all the stats. If you just want to see 1, comment out the functions in the ```run_algos``` methode
+
+Analysis can be found in the file ```analysis_output_file.txt```
