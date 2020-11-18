@@ -1,0 +1,74 @@
+Algo Analysis 
+#### Uniform Cost #### 
+uc_total_cost: 668 AVG: 13.36
+uc_solutions_found: 50
+uc_total_execution_time: 62.68009090423584 AVG: 1.2536018180847168
+uc_total_solution_path_length: 533 AVG: 10.66
+uc_total_search_path: 1388733 AVG: 27774.66
+#### A* ####h1 as_total_cost: 652 AVG: 13.583333333333334
+h1  as_solutions_found: 48
+h1 as_total_execution_time: 290.40759778022766 AVG: 6.050158287088077
+h1 as_total_solution_path_length: 569 AVG: 11.854166666666666
+h1 as_total_search_path: 70241 AVG: 1463.3541666666667
+h2 as_total_cost: 694 AVG: 13.88
+h2  as_solutions_found: 50
+h2 as_total_execution_time: 57.754091024398804 AVG: 1.155081820487976
+h2 as_total_solution_path_length: 597 AVG: 11.94
+h2 as_total_search_path: 25163 AVG: 503.26
+#### Greedy Best First Search #### 
+gbfs_total_cost: 2010 AVG: 40.2
+gbfs_solutions_found: 50
+gbfs_total_execution_time: 1.027193307876587 AVG: 0.02054386615753174
+gbfs_total_solution_path_length: 3955 AVG: 79.1
+gbfs_total_search_path: 7198 AVG: 143.96
+#### These are the Puzzles #### 
+2 3 7 6 1 0 5 4
+6 0 1 3 7 5 4 2
+3 7 5 6 4 0 1 2
+4 7 0 5 1 6 3 2
+7 3 4 0 6 1 5 2
+5 4 7 1 2 3 0 6
+4 7 6 5 1 3 0 2
+7 2 3 4 5 6 0 1
+4 1 5 2 0 3 7 6
+3 1 6 4 2 5 7 0
+4 6 2 5 7 1 0 3
+7 3 0 1 6 4 5 2
+5 1 3 0 6 2 7 4
+4 0 1 2 6 3 7 5
+3 6 7 0 4 1 5 2
+6 7 4 3 0 5 1 2
+0 3 1 7 5 2 4 6
+3 7 0 4 5 2 6 1
+4 2 6 1 7 3 0 5
+4 3 2 5 0 1 7 6
+5 6 7 3 1 4 0 2
+0 4 7 6 3 2 1 5
+1 3 5 0 4 7 6 2
+3 1 0 5 6 2 7 4
+1 3 0 4 5 6 7 2
+3 5 4 2 6 0 1 7
+2 0 4 5 1 7 6 3
+6 2 4 0 1 5 7 3
+7 6 3 5 0 4 2 1
+3 1 5 0 4 7 6 2
+1 6 0 4 3 2 7 5
+3 2 1 6 5 7 4 0
+3 7 4 5 1 6 0 2
+3 5 7 0 6 1 4 2
+4 6 2 0 1 3 7 5
+4 0 6 5 3 2 7 1
+4 3 7 5 1 2 0 6
+1 6 4 5 2 7 3 0
+3 4 5 6 1 2 7 0
+0 5 4 3 6 7 1 2
+4 6 1 0 5 3 7 2
+5 7 6 1 0 4 3 2
+1 4 5 6 0 3 2 7
+7 1 4 0 3 6 2 5
+5 2 6 1 0 7 3 4
+5 1 4 6 2 0 3 7
+7 1 3 2 0 4 6 5
+7 4 2 1 5 3 0 6
+1 5 0 4 7 3 6 2
+3 5 4 7 0 1 2 6
