@@ -2,7 +2,10 @@ import time
 from queue import PriorityQueue
 from xpuzzle import XPuzzle
 import numpy as np
-
+## To run the code 'python gbfs.py'
+## To switch in between heuristics you must 
+## 1. ctrl-f 'gbfs_hX' and replace them all with 'gbfs_hY' X and Y being   0 for h0, 1 for h1, 2 for h2
+## 2. ctrl-f(.heuristicX) and replace them all with '.heuristic1Y' X and Y being   0 for h0, 1 for h1, 2 for h2
 class GreedyBestFirstSearch:
     def __init__(self, initial_state, rows, cols, id):
         self.open_list = PriorityQueue()
@@ -13,18 +16,20 @@ class GreedyBestFirstSearch:
         self.cols = cols
         self.id = str(id)
 
-    def run(self):
+    def run(self, log_to_csv = True):
         print('start algo for: ' + self.initial_state)
         self.initialize_txt_files()
         start = time.time()
         goal_state_1 = self.calculate_goal_state_1()
         goal_state_2 = self.calculate_goal_state_2()
+        search_count = 0
         # nodes that need to be visited (priority queue or dictionairy)
         self.set_state_open_list(self.initial_state, 0)
         self.close_list = {}
         while (not self.open_list.empty()):
             if (time.time() - start > 60):
-                        break
+                found_goal = False
+                break
             # finds the smallest cost path and visits it
             current_node = self.open_list.get()
             current_node_cost = current_node[0]
@@ -33,19 +38,21 @@ class GreedyBestFirstSearch:
             cost_of_current_move = current_node[3]
             tile_that_was_moved = current_node[4]
             total_path_cost = current_node[5]
+            search_count += 1
 
             if current_node_key not in self.close_list:
                 self.close_list[current_node_key] = (
                     current_node_cost, current_node_prev_key, cost_of_current_move, tile_that_was_moved)
 
                 # writes search path to txt file
-                with open(self.id + "_gbfs_h0_search.txt", "a") as gbfs_search:
+                with open(self.id + "_gbfs_h1_search.txt", "a") as gbfs_search:
                     gbfs_search.write(
                         self.id + " " + str(total_path_cost) + " 0 " + current_node_key+"\n")
 
                 # checks if goal state was reached
                 if(current_node_key == goal_state_1 or current_node_key == goal_state_2):
                     self.goal_node = current_node
+                    found_goal = True
                     break
 
                 # now we need to add the new nodes to the open list
@@ -54,15 +61,25 @@ class GreedyBestFirstSearch:
 
         end = time.time()
         print('I finished running in: ' + str(end - start) + " seconds")
-        solution_array = self.get_algorithm_stats(str(end - start))
+        
+       # solution_array = self.get_algorithm_stats(str(end - start))
+        solution_array = self.close_list
 
-        if solution_array == -1:
-            with open(self.id+"_gbfs_h0_search.txt", "a") as gbfs_search:
-                gbfs_search.write("No solution")
-        else:
-            with open(self.id+"_gbfs_h0_solution.txt", "a") as gbfs_solution:
-                for line in solution_array:
-                    gbfs_solution.write(line+"\n")
+        if log_to_csv:
+            if solution_array == -1:
+                with open(self.id+"_gbfs_h1_search.txt", "a") as gbfs_search:
+                    gbfs_search.write("No solution")
+            else:
+                with open(self.id+"_gbfs_h1_solution.txt", "a") as gbfs_solution:
+                    for line in solution_array:
+                        gbfs_solution.write(line+"\n")
+
+        total_cost = self.goal_node[5] if found_goal else None
+        if found_goal == True:
+            print(len(list(solution_array)))
+            solution_path_len = len(solution_array) - 1
+        else: solution_path_len = None
+        return {'total cost': total_cost, 'found_a_solution': found_goal, 'solution_path_length': solution_path_len, 'search_path_length': search_count, 'execution_time': (end - start)}
 
     def normal_move_action_string(self, state, action):
         puzzle = XPuzzle(self.rows, self.cols, state)
@@ -89,50 +106,42 @@ class GreedyBestFirstSearch:
             return -1
 
     def set_state_open_list(self, current_state, base_amount):
-        # 1 cost actions: up, down, left, right
-        # 2 cost actions: wrapping_move
-        # 3 cost actions: diagonal_move, diagonal_move(wrap)
-        # total of 8 actions
-
-        # up_action = self.normal_move_action_string(current_state, "up") ## THIS IS THE POTENTIAL NEXT STATE
-        # if(up_action != -1): self.open_list.put((HEURISTIC(UP_ACTION['KEY']), up_action['key'], current_state, 1, up_action['tile_moved']))
-
-       # open list = (heuristic-choice,total cost, current_key, previous_key, cost, tile_moved, cumulative cost)
+      
         up_action = self.normal_move_action_string(current_state, "up")
-        if(up_action != -1): self.open_list.put(((self.heuristic_0(
+        if(up_action != -1): self.open_list.put(((self.heuristic_1(
             up_action['key'])), up_action['key'], current_state, 1, up_action['tile_moved'], (1 + base_amount)))
 
         down_action = self.normal_move_action_string(current_state, "down")
-        if(down_action != -1): self.open_list.put(((self.heuristic_0(
+        if(down_action != -1): self.open_list.put(((self.heuristic_1(
             down_action['key'])), down_action['key'], current_state, 1, down_action['tile_moved'], (1 + base_amount)))
 
         left_action = self.normal_move_action_string(current_state, "left")
-        if(left_action != -1): self.open_list.put(((self.heuristic_0(
+        if(left_action != -1): self.open_list.put(((self.heuristic_1(
             left_action['key'])), left_action['key'], current_state, 1, left_action['tile_moved'], (1 + base_amount)))
 
         right_action = self.normal_move_action_string(current_state, "right")
-        if(right_action != -1): self.open_list.put(((self.heuristic_0(
+        if(right_action != -1): self.open_list.put(((self.heuristic_1(
             right_action['key'])), right_action['key'], current_state, 1, right_action['tile_moved'], (1 + base_amount)))
 
         wrapping_action = self.wrapping_move_action_string(
             current_state, False)
-        if(wrapping_action != -1): self.open_list.put(((self.heuristic_0(
+        if(wrapping_action != -1): self.open_list.put(((self.heuristic_1(
             wrapping_action['key'])), wrapping_action['key'], current_state, 2, wrapping_action['tile_moved'], (2 + base_amount)))
 
         diagonal_action = self.diagonal_move_action_string(
             current_state, False)
-        if(diagonal_action != -1): self.open_list.put(((self.heuristic_0(
+        if(diagonal_action != -1): self.open_list.put(((self.heuristic_1(
             diagonal_action['key'])), diagonal_action['key'], current_state, 3, diagonal_action['tile_moved'], (3 + base_amount)))
 
         diagonal_action_wrap = self.diagonal_move_action_string(
             current_state, True)
-        if(diagonal_action_wrap != -1): self.open_list.put(((self.heuristic_0(
+        if(diagonal_action_wrap != -1): self.open_list.put(((self.heuristic_1(
             diagonal_action_wrap['key'])), diagonal_action_wrap['key'], current_state, 3, diagonal_action['tile_moved'], (3 + base_amount)))
 
         if self.rows > 2:
             wrapping_action_col = self.wrapping_move_action_string(
                 current_state, True)
-            if(wrapping_action_col != -1): self.open_list.put(((self.heuristic_0(
+            if(wrapping_action_col != -1): self.open_list.put(((self.heuristic_1(
                 wrapping_action_col['key'])), wrapping_action_col['key'], current_state, 2, wrapping_action_col['tile_moved'], (2 + base_amount)))
 
 # for h0 - given heuristics -checks if 0 is in the right place
@@ -216,24 +225,23 @@ class GreedyBestFirstSearch:
             print('no goal state found')
             return -1
         else:
-            summ = "TIME: " + time + "s, COST: " + str(self.goal_node[5])
+            summ = "TIME: " + time + "s, COST: " + str(self.goal_node[0])
             order = [summ]
             previous_node = self.goal_node[1]
             print("Found Goal Node")
             print(summ)
             while(previous_node != self.initial_state):
                 # 3 = tile moved, 2 = cost of move, 1 = previous move
-                value = str(self.close_list[previous_node][3]) + " " + str(
-                    self.close_list[previous_node][2]) + " " + str(previous_node)
+                value = str(self.close_list[previous_node][3]) + " " + str(self.close_list[previous_node][2]) +" "+ str(previous_node)
                 order.append(value)
                 previous_node = self.close_list[previous_node][1]
             return reversed(order)
 
     def initialize_txt_files(self):
-        uniform_cost_search_file = open(self.id+"_gbfs_h0_search.txt", "w")
+        uniform_cost_search_file = open(self.id+"_gbfs_h1_search.txt", "w")
         uniform_cost_search_file.write("0 0 0 " + self.initial_state + "\n")
         uniform_cost_search_file.close()
-        uniform_cost_solution_file = open(self.id+"_gbfs_h0_solution.txt", "w")
+        uniform_cost_solution_file = open(self.id+"_gbfs_h1_solution.txt", "w")
         uniform_cost_solution_file.write("0 0 " + self.initial_state + "\n")
         uniform_cost_solution_file.close()
 
