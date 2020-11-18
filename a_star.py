@@ -10,7 +10,7 @@ class AStart:
         self.read_input_file(filename)
         self.goal_state1 = [['1', '2', '3', '4',],['5', '6', '7', '0']]
         self.goal_state2 = [['1', '3', '5', '7'],['2','4','6','0']]
-        self.heuristics = ['Hamming Distance', 'Manhattan Distance']
+        self.heuristics = ['h1', 'h2', 'h0']
         self.heuristic = ''
         #self.goal_state1 = [['1', '2', '3', '4',],['5', '6', '7', '8'],['9','10','11','0']]
         #self.goal_state2 = [['1', '4', '7', '10'],['2','5','8','11'],['3','6','9','0']]
@@ -47,9 +47,9 @@ class AStart:
             g_n = state[5] + cost
             #choose heuristic
             h_n = 0
-            if (self.heuristic == 'Hamming Distance'):
+            if (self.heuristic == 'h1'):
                 h_n = self.get_hamming_distance(successor)
-            elif (self.heuristic == 'Manhattan Distance'):
+            elif (self.heuristic == 'h2'):
                 h_n = self.get_manhattan_distance(successor)
             elif (self.heuristic == 'h0'):
                 h_n = self.get_h0(successor)
@@ -227,7 +227,7 @@ class AStart:
             np_goal = np.asarray(goal_state)
             np_succ = np.asarray(successor_state)
             manhattan_distances.append(0)
-            for i in range(8):
+            for i in range(self.puzzle.cols * self.puzzle.rows):
                 beg = np.where(np_succ == str(i))
                 beg_row = beg[0][0]
                 beg_col = beg[1][0]
@@ -247,18 +247,23 @@ class AStart:
         return output
     
     def run_algo(self):
-        for h in self.heuristics:
-            self.heuristic = h
-            print("Using", h)
-            for x in self.inputs:
+        for input_i, x in enumerate(self.inputs):
+            for h in self.heuristics:
+                print('Computing', str(x), h)
                 self.reset(x)
+                self.heuristic = h
+                        
                 start = time.time()
                 chosen_state = self.initial_state
                 if (chosen_state[1] == self.goal_state1 or chosen_state[1] == self.goal_state2):
                     self.is_goal_state = True
                 i = 0
                 
+                is_no_solution = False
                 while (not self.is_goal_state):
+                    if (time.time() - start > 60):
+                        is_no_solution = True
+                        break
                     self.add_successors_to_open_list(chosen_state)
                     if (self.open_list.empty()):
                         break 
@@ -270,30 +275,36 @@ class AStart:
                         break
                     self.close_list.put(copy.deepcopy(chosen_state))
                     i = i + 1
+
+                #handle_no_solution
+                if is_no_solution:
+                    with open(str(input_i) + "_astar-" + h + "_search.txt", 'w') as f:
+                        f.write("no_solution\n")
+                    with open(str(input_i) + "_astar-" + h + "_solution.txt", 'w') as f:
+                        f.write("no_solution\n")
+                    break
                 #done
                 end = time.time()
                 
-                #print solution and search
+                #output solution and search
                 nodes = []
                 while(not chosen_state == None):
                     nodes.append(chosen_state)
                     chosen_state = chosen_state[6]
                 nodes = nodes[::-1] #reverses list
                 
-                #print the search space
-                for key, value in self.search_space.items():
-                    print(value)
-                print("")
+                #output the search space
+                with open(str(input_i) + "_astar-" + h + "_search.txt", 'w') as f:
+                    for key, value in self.search_space.items():
+                        f.write(value+"\n")
 
                 #print the solution space
-                cost = 0
-                for node in nodes:
-                    print (node[7], node[3], self.stringify_state(node[1]))
-                    cost += node[3]
-                print(cost, str(round((end - start),5)))
-                print("")
-                print("**************************************************")
-                print("")
+                with open(str(input_i) + "_astar-" + h + "_solution.txt", 'w') as f:
+                    cost = 0
+                    for node in nodes:
+                        f.write(str(node[7]) + " " + str(node[3]) + " " + self.stringify_state(node[1]) + "\n")
+                        cost += node[3]
+                    f.write(str(cost) + " " +str(round((end - start),5)))
 
 algo = AStart("inputs.txt")
 algo.run_algo()
