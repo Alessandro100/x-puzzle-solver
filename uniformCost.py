@@ -16,10 +16,13 @@ class UniformCost:
         self.cols = cols
         self.id = str(id)
 
-    def run(self):
+    def run(self, log_result_to_csv = False):
         print('start algo for: ' + self.initial_state)
-        self.initialize_txt_files()
+        if log_result_to_csv:
+            self.initialize_txt_files()
+        search_count = 0
         start = time.time()
+        found_goal = False
         goal_state_1 = self.calculate_goal_state_1()
         goal_state_2 = self.calculate_goal_state_2()
         self.set_state_open_list(self.initial_state, 0) # nodes that need to be visited (priority queue or dictionairy)
@@ -32,17 +35,20 @@ class UniformCost:
             current_node_prev_key = current_node[2]
             cost_of_current_move = current_node[3]
             tile_that_was_moved = current_node[4]
+            search_count += 1
 
             if current_node_key not in self.close_list or self.close_list[current_node_key][0] > current_node_cost:
                 self.close_list[current_node_key] = (current_node_cost, current_node_prev_key, cost_of_current_move, tile_that_was_moved)
 
                 # writes search path to txt file
-                with open(self.id + "_ucs_search.txt", "a") as ucs_search:
-                    ucs_search.write(self.id + " " + str(current_node_cost) +" 0 " + current_node_key+"\n")
+                if log_result_to_csv:
+                    with open(self.id + "_ucs_search.txt", "a") as ucs_search:
+                        ucs_search.write(self.id + " " + str(current_node_cost) +" 0 " + current_node_key+"\n")
                 
                 # checks if goal state was reached
                 if(current_node_key == goal_state_1 or current_node_key == goal_state_2):
                     self.goal_node = current_node
+                    found_goal = True
                     break
 
                 # now we need to add the new nodes to the open list
@@ -52,13 +58,18 @@ class UniformCost:
         print('I finished running in: ' + str(end - start) + " seconds")
         solution_array = self.get_algorithm_stats(str(end - start))
 
-        if solution_array == -1:
-            with open(self.id+"_ucs_search.txt", "a") as ucs_search:
-                    ucs_search.write("No solution")
-        else:
-            with open(self.id+"_ucs_solution.txt", "a") as ucs_solution:
-                    for line in solution_array:
-                        ucs_solution.write(line+"\n")
+        if log_result_to_csv:
+            if solution_array == -1:
+                with open(self.id+"_ucs_search.txt", "a") as ucs_search:
+                        ucs_search.write("No solution")
+            else:
+                with open(self.id+"_ucs_solution.txt", "a") as ucs_solution:
+                        for line in solution_array:
+                            ucs_solution.write(line+"\n")
+
+        total_cost = self.goal_node[0] if found_goal else None
+        solution_path_len = len(list(solution_array)) - 1
+        return {'total cost': total_cost, 'found_a_solution': found_goal, 'solution_path_length': solution_path_len, 'search_path_length': search_count, 'execution_time': (end - start)}
 
 
     def normal_move_action_string(self, state, action):
