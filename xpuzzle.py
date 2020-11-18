@@ -13,20 +13,48 @@ class XPuzzle:
         input_arr = input.split(" ")
         count = 0
         for i in range(self.rows): 
-            col = [] 
+            row = [] 
             for j in range(self.cols): 
                 value = input_arr[count]
                 if(value == '0'):
                     self.zero_position = (i,j)
-                col.append(value)
+                row.append(value)
                 count += 1
-            self.arr.append(col)
+            self.arr.append(row)
 
     # prints the data structure in a nice format for the console
     def pretty_print_array(self):
         for row in self.arr:
             print(*row)
 
+    def find_valid_moves(self):
+        valid_moves = []
+        if (self.zero_position[0] != 0):
+            valid_moves.append('up')
+        if (self.zero_position[0] != self.rows - 1):
+            valid_moves.append('down')
+        if (self.zero_position[1] != 0):
+            valid_moves.append('left')
+        if (self.zero_position[1] != self.cols - 1):
+            valid_moves.append('right')
+
+        if (self.zero_position[0] == 0 and self.zero_position[1] == 0):
+            valid_moves.append('top_left_wrap')
+            valid_moves.append('top_left_diagonal_wrap')
+            valid_moves.append('top_left_diagonal_adjacent')
+        elif (self.zero_position[0] == 0 and self.zero_position[1] == (self.cols - 1)):
+            valid_moves.append('top_right_wrap')
+            valid_moves.append('top_right_diagonal_wrap')
+            valid_moves.append('top_right_diagonal_adjacent')
+        elif (self.zero_position[0] == (self.rows - 1) and self.zero_position[1] == 0):
+            valid_moves.append('bottom_left_wrap')
+            valid_moves.append('bottom_left_diagonal_wrap')
+            valid_moves.append('bottom_left_diagonal_adjacent')
+        elif (self.zero_position[0] == (self.rows - 1) and self.zero_position[1] == (self.cols - 1)):
+            valid_moves.append('bottom_right_wrap')
+            valid_moves.append('bottom_right_diagonal_wrap')
+            valid_moves.append('bottom_right_diagonal_adjacent')
+        return valid_moves 
 
     # moves the empty tile: up, down, left, right and will print invalid if the move is not correct while returning -1
     def regular_move(self, move_direction_of_empty_tile):
@@ -57,11 +85,11 @@ class XPuzzle:
         self.arr[self.zero_position[0]][self.zero_position[1]] = value_swap
         self.arr[row_swap][col_swap] = 0
         self.zero_position = (row_swap, col_swap)
-        return value_swap
+        return 0
 
     # wrapping move will auto detect if possible and will do it if it is
-    def wrapping_move(self, wrap_column = False):
-        if(wrap_column and self.rows > 2):
+    def wrapping_move(self, column = False):
+        if(column and self.rows > 2):
             return self.__wrapping_move_with_column()
 
         diagonal_info = self.__corner_position_information()
@@ -85,7 +113,7 @@ class XPuzzle:
         diagonal_info = self.__corner_position_information()
 
         if(diagonal_info['is_zero_top_left']):
-            return self.__swap(self.row - 1, 0)
+            return self.__swap(self.rows - 1, 0)
 
         if(diagonal_info['is_zero_top_right']):
             return self.__swap(self.rows - 1, self.cols - 1)
@@ -101,38 +129,38 @@ class XPuzzle:
     def __corner_position_information(self):
             zero_row = self.zero_position[0]
             zero_col = self.zero_position[1]
-            diagonal_dict = {
+            diagonal_info = {
                 'is_zero_top_left': (zero_row == 0 and zero_col == 0),
                 'is_zero_top_right': (zero_row == 0 and zero_col == self.cols - 1),
                 'is_zero_bottom_left': (zero_row == self.rows - 1 and zero_col == 0),
                 'is_zero_bottom_right': (zero_row == self.rows - 1 and zero_col == self.cols - 1)
             }
-            return diagonal_dict
+            return diagonal_info
 
     # if the 0 is in a corner, it can wrap and swap there, or it can move diagonally within
-    def diagonal_move(self, is_wrap_move):
+    def diagonal_move(self, is_move):
         diagonal_info = self.__corner_position_information()
 
         if(diagonal_info['is_zero_top_left']):
-            if(is_wrap_move):
+            if(is_move):
                 return self.__swap(self.rows - 1, self.cols - 1)
             else:
                 return self.__swap(1, 1)
         
         if(diagonal_info['is_zero_top_right']):
-            if(is_wrap_move):
+            if(is_move):
                 return self.__swap(self.rows - 1, 0)
             else:
                 return self.__swap(1, self.cols - 2)
 
         if(diagonal_info['is_zero_bottom_left']):
-            if(is_wrap_move):
+            if(is_move):
                 return self.__swap(0, self.cols - 1)
             else:
                 return self.__swap(self.rows - 2, 1)
 
         if(diagonal_info['is_zero_bottom_right']):
-            if(is_wrap_move):
+            if(is_move):
                 return self.__swap(0, 0)
             else:
                 return self.__swap(self.rows - 2, self.cols - 2)
@@ -145,15 +173,16 @@ class XPuzzle:
             goal_string += str(i + 1) + ' '
         goal_string += '0'
 
-        return goal_string == current_state_to_string(self)
+        return goal_string == self.current_state_to_string()
 
     def current_state_to_string(self):
         return ' '.join(map(str, [ y for x in self.arr for y in x]))
 
 # Examples
-puzzle = XPuzzle(2, 4, '1 2 3 4 5 6 0 7')
-puzzle.regular_move('down')
-#puzzle.regular_move('left');
+#puzzle = XPuzzle(2, 4, '1 2 3 4 5 6 0 7')
+#puzzle.pretty_print_array()
+#puzzle.regular_move('down')
+#puzzle.regular_move('left')
 #puzzle.diagonal_move(False)
 #puzzle.diagonal_move(True)
 #puzzle.wrapping_move()
