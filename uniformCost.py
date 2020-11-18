@@ -176,12 +176,12 @@ class UniformCost:
 #1 0 3 6 5 2 7 4
 #6 3 4 7 1 2 5 0
 #3 0 1 4 2 6 5 7
-algo1 = UniformCost("1 0 3 6 5 2 7 4", 2, 4, 0)
-algo2 = UniformCost("6 3 4 7 1 2 5 0", 2, 4, 1)
-algo3 = UniformCost("3 0 1 4 2 6 5 7", 2, 4, 2)
-algo4 = UniformCost("1 2 3 4 0 5 6 7 8 9 10 11", 3, 4, 3)
+# algo1 = UniformCost("1 0 3 6 5 2 7 4", 2, 4, 0)
+# algo2 = UniformCost("6 3 4 7 1 2 5 0", 2, 4, 1)
+# algo3 = UniformCost("3 0 1 4 2 6 5 7", 2, 4, 2)
+# algo4 = UniformCost("1 2 3 4 0 5 6 7 8 9 10 11", 3, 4, 3)
 
-algo1.run()
-algo2.run()
-algo3.run()
-algo4.run()
+# algo1.run()
+# algo2.run()
+# algo3.run()
+# algo4.run()

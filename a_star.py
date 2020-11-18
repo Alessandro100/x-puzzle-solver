@@ -5,20 +5,27 @@ import numpy as np
 import ctypes
 import time
 
-class AStart: 
-    def __init__(self, filename):
-        self.read_input_file(filename)
+class AStar: 
+    #def __init__(self, filename, rows, columns):
+    def __init__(self, puzzle, rows, columns):
+        #self.read_input_file(filename)
+        self.inputs = [puzzle]
         self.goal_state1 = [['1', '2', '3', '4',],['5', '6', '7', '0']]
         self.goal_state2 = [['1', '3', '5', '7'],['2','4','6','0']]
-        self.heuristics = ['h1', 'h2', 'h0']
+        #self.heuristics = ['h1', 'h2', 'h0']
+        self.heuristics = ['h1', 'h2']
         self.heuristic = ''
+        self.rows = 2
+        self.columns = 4
+        self.puzzle = XPuzzle(self.rows, self.columns, puzzle)
         #self.goal_state1 = [['1', '2', '3', '4',],['5', '6', '7', '8'],['9','10','11','0']]
         #self.goal_state2 = [['1', '4', '7', '10'],['2','5','8','11'],['3','6','9','0']]
+        self.analysis = {}
     
     def reset(self, initial_state):
         self.close_list = PriorityQueue()
         self.open_list = PriorityQueue()
-        self.puzzle = XPuzzle(2, 4, initial_state)
+        self.puzzle = XPuzzle(self.rows, self.columns, initial_state)
         self.initial_state = (0,copy.deepcopy(self.puzzle.arr),0,0,0,0, None, 0)
         self.is_goal_state = False
         self.ignore_move = ''
@@ -276,16 +283,9 @@ class AStart:
                     self.close_list.put(copy.deepcopy(chosen_state))
                     i = i + 1
 
-                #handle_no_solution
-                if is_no_solution:
-                    with open(str(input_i) + "_astar-" + h + "_search.txt", 'w') as f:
-                        f.write("no_solution\n")
-                    with open(str(input_i) + "_astar-" + h + "_solution.txt", 'w') as f:
-                        f.write("no_solution\n")
-                    break
                 #done
                 end = time.time()
-                
+
                 #output solution and search
                 nodes = []
                 while(not chosen_state == None):
@@ -306,7 +306,21 @@ class AStart:
                         cost += node[3]
                     f.write(str(cost) + " " +str(round((end - start),5)))
 
-algo = AStart("inputs.txt")
-algo.run_algo()
+                #handle_no_solution
+                if is_no_solution:
+                    print("No solution")
+                    self.analysis[h] = {'total cost': None, 'found_a_solution': self.is_goal_state, 'solution_path_length': len(list(nodes)), 'search_path_length': len(list(self.search_space.items())), 'execution_time': (end - start)}
+                    with open(str(input_i) + "_astar-" + h + "_search.txt", 'w') as f:
+                        f.write("no_solution\n")
+                    with open(str(input_i) + "_astar-" + h + "_solution.txt", 'w') as f:
+                        f.write("no_solution\n")
+                else:
+                    self.analysis[h] = {'total cost': cost, 'found_a_solution': self.is_goal_state, 'solution_path_length': len(list(nodes)), 'search_path_length': len(list(self.search_space.items())), 'execution_time': (end - start)}
+                    print(self.analysis[h])
+        return self.analysis
+
+# algo = AStar("3 0 1 4 2 6 5 7", 2, 4)
+# algo.run_algo()
+
 
 #TODO: Optimize h_0 and print to files instead of console.
